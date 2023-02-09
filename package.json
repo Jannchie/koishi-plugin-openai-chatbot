@@ -2,8 +2,11 @@
   "name": "koishi-plugin-openai-chatbot",
   "author": "Jannchie <jannchie@gmail.com>",
   "description": "A plugin for Koishi to integrate with OpenAI's GPT-3 language model as a chatbot.",
-  "repository": "https://github.com/jannchie/koishi-plugin-openai-chatbot",
-  "version": "1.0.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jannchie/koishi-plugin-openai-chatbot.git"
+  },
+  "version": "1.0.3",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -27,9 +30,6 @@
   },
   "koishi": {
     "browser": true,
-    "service": {
-      "optional": []
-    },
     "description": {
       "en": "Integrate with OpenAI's GPT-3 language model as a chatbot.",
       "zh": "与 OpenAI 的 GPT-3 语言模型整合的一个聊天机器人。"
