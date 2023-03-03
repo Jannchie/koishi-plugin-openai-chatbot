@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/jannchie/koishi-plugin-openai-chatbot.git"
   },
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
