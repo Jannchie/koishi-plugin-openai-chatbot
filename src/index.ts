@@ -6,7 +6,6 @@ export const name = 'openai-chatbot'
 export interface Config {
   apiKey: string
   model: string
-  prompt: string
   temperature: number
   max_tokens: number
   top_p: number
@@ -19,13 +18,8 @@ export interface Config {
 export const Config: Schema<Config> = Schema.object({
   apiKey: Schema.string().required().description("OpenAI API Key: https://platform.openai.com/account/api-keys"),
   triggerWord: Schema.string().default("请问，").description("触发机器人回答的关键词。"),
-  model: Schema.union(['text-davinci-003', 'text-ada-001', 'text-babbage-001', 'text-curie-001']).default('text-davinci-003'),
-  prompt: Schema.string().default(`以下是与一个人工智能助手的对话。这位助手很有帮助，很有创意，很聪明，而且非常友好。
-Human: 你好。
-AI: 你好，我能如何为您服务?
-Human: {q}
-AI:
-`).description('在插入的文本的前缀，用于添加一些先置情报。'),
+  model: Schema.union(['text-davinci-003', 'text-ada-001', 'text-babbage-001', 'text-curie-001','gpt-3.5-turbo']).default('text-davinci-003'),
+
   temperature: Schema.number().default(0.7).description("温度，更高的值意味着模型将承担更多的风险。对于更有创造性的应用，可以尝试0.9，而对于有明确答案的应用，可以尝试0（argmax采样）。"),
   max_tokens: Schema.number().default(500).description("生成的最大令牌数。"),
   top_p: Schema.number().default(1),
@@ -41,18 +35,13 @@ export function apply(ctx: Context, config: Config) {
   });
   const openai = new OpenAIApi(configuration);
 
-  const prompt = config.prompt.replace(/\\n/g, "\n")
-  function getPrompt(prompt: string, q: string) {
-    var output = prompt.replace("{q}", q);
-    return output;
-  }
 
   ctx.on('message', (session) => {
     if (session.content.startsWith(config.triggerWord)) {
       const q = session.content.replace(config.triggerWord, '')
-      openai.createCompletion({
+      openai.createChatCompletion({
         model: config.model,
-        prompt: getPrompt(prompt, q),
+        messages:[{role:"user",content:q}],
         temperature: config.temperature,
         max_tokens: config.max_tokens,
         top_p: config.top_p,
@@ -60,7 +49,7 @@ export function apply(ctx: Context, config: Config) {
         presence_penalty: config.presence_penalty,
         stop: config.stop,
       }).then((data) => {
-        session.send(data.data.choices[0].text)
+        session.send(data.data.choices[0].message.content)
       }).catch(() => {
         session.send(config.errorMessage)
       });
